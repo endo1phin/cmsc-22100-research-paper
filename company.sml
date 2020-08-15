@@ -21,8 +21,7 @@ datatype Dept
 and SubUnit 
   = PU of Employee 
   | DU of Dept
-datatype Company = C of Dept list
-
+and Company = C of Dept list
 
 (*==== Construct example data ====*)
 
@@ -51,4 +50,26 @@ fun increase k (C ds) = C (map (incD k) ds)
 *)
 
 
-(*==== A better solution ====*)
+(*==== Type extension ====*)
+
+
+datatype any = V of exn
+
+fun mkAnyFuncs () = 
+  let exception Tag of 'a
+    fun mkV v = V (Tag v)
+    fun getV (V (Tag v)) = SOME v
+      | getV _ = NONE
+  in (mkV, getV)
+  end
+
+datatype transform = T of any -> any
+and 'a transformOps = TransOps of {
+  mkT : ('a -> 'a) -> transform,
+  useT : transform -> ('a -> 'a)
+}
+
+val idT = T (fn x => x)
+
+  
+
